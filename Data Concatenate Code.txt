@@ -1,0 +1,134 @@
+Sub Concatenate()
+'
+' Macro3 Macro
+'
+Dim worksheet1 As Worksheet, BottomRow As Long
+'Dim BottomOfDates1 As Long
+Set worksheet1 = ActiveSheet
+Dim a As String
+Dim b As String
+Dim d As Integer
+Dim j As Integer
+Dim k As Integer
+Dim q As Integer
+
+Application.ScreenUpdating = False
+
+d = Cells(2, 2).Value
+
+    
+    'Dim TopRow As Long, Rnh1 As Range
+    'TopRow = Range("AC1").End(xlDown).Row
+    'TopRow = TopRow + 1
+    
+BottomRow = worksheet1.Range("A" & worksheet1.Rows.Count).End(xlUp).Row
+Dim BottomRowCon As Integer
+
+
+For i = 5 To BottomRow
+    If Cells(i, 3).Value = 0 Then
+        BottomRowCon = i - 1
+        Exit For
+    Else
+    End If
+Next i
+    
+
+'Cells(1, 15).Value = BottomRowCon
+If BottomRowCon <= 5 Then
+    BottomRowCon = 6
+Else
+End If
+Range("C5:C" & BottomRowCon).Select
+Selection.ClearContents
+
+'BottomRow = BottomRow - 1
+
+'BottomOfDates1 = worksworking.Range("A" & worksworking.Rows.Count).End(xlUp).Row
+'BottomOfDates1 = BottomOfDates1 + 1
+
+'
+'DELETE PREVIOUS RESULTS:
+For k = 5 To (BottomRow / 2)
+    Range("C" & k).Select
+    ActiveCell.FormulaR1C1 = ""
+Next k
+
+
+j = 1
+For i = 2 To BottomRow
+    For q = 1 To BottomRow
+        If ((i - 2) / d) = 1 * q Then
+            j = j + 1
+        Else
+        End If
+    Next q
+    If Cells(4 + j, 3).Value > 0 Then
+    
+        a = Cells(i, 1).Value
+        b = Cells(4 + j, 3).Value
+        Cells(4 + j, 3).Value = b + "+" + a
+    Else
+        Cells(4 + j, 3).Value = Cells(i, 1).Value
+    End If
+
+Next i
+
+If BottomRow = 1 Then
+    MsgBox "No data to concatenate. Make sure you paste data in Column A starting at Cell A2."
+Else
+End If
+
+ActiveWindow.ScrollRow = 1
+Range("C5").Select
+
+Application.ScreenUpdating = True
+
+End Sub
+
+Sub ClearPasteData()
+Dim worksheet1 As Worksheet, BottomRow As Long
+Set worksheet1 = ActiveSheet
+Dim a As String
+Dim b As String
+Dim d As Integer
+Dim j As Integer
+Dim k As Integer
+Dim q As Integer
+
+Application.ScreenUpdating = False
+
+    
+BottomRow = worksheet1.Range("A" & worksheet1.Rows.Count).End(xlUp).Row
+
+
+Dim BottomRowCon As Integer
+
+For i = 5 To BottomRow
+    If Cells(i, 3).Value = 0 Then
+        BottomRowCon = i - 1
+        Exit For
+    Else
+    End If
+Next i
+
+If BottomRow = 1 Then
+    BottomRow = 3
+Else
+End If
+Range("A2:A" & BottomRow).Select
+Selection.ClearContents
+
+If BottomRowCon <= 5 Then
+    BottomRowCon = 6
+Else
+End If
+Range("C5:C" & BottomRowCon).Select
+Selection.ClearContents
+
+Range("C5").Value = "Concatenated Data Will Appear Here"
+
+
+Range("A2").Select
+Application.ScreenUpdating = True
+End Sub
