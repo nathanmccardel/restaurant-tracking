@@ -1,0 +1,565 @@
+Sub GetValuesFromFile()
+Dim wbName As String, wb As Workbook, ws As Worksheet
+Application.ScreenUpdating = False
+'txt = "C:\Users\" & insertuserID & "\Desktop\Test References\CC_Master_Test.xlsm"
+txt = "C:\Users\" & insertuserID & "\Desktop\Test References\2019\05062019\node_profile_190506012023.zip\nodeprofile.csv"
+
+entUnZip1File "C:\Users\" & insertuserID & "\Desktop\Test References\2019\05062019\node_profile_190506012023.zip", "C:\Users\" & insertuserID & "\Desktop", "nodeprofile.csv"
+
+
+If Dir(txt) = "" Then
+    MsgBox txt & " does not exist"
+Else
+    Set wb = Workbooks.Open(txt)
+    On Error Resume Next
+    Set ws = wb.Sheets("Master Restaurant List")
+    If Not ws Is Nothing Then
+        MsgBox ws.Range("c3")
+        wb.Close
+    Else
+        MsgBox ws.Name & " does not exist"
+    End If
+    Err.Clear
+End If
+
+Application.ScreenUpdating = True
+End Sub
+
+Function entUnZip1File(ByVal strZipFilename, ByVal strDstDir, _
+  ByVal strFilename)
+'
+  Const glngcCopyHereDisplayProgressBox = 256
+'
+  Dim intOptions, objShell, objSource, objTarget
+'
+' Create the required Shell objects
+  Set objShell = CreateObject("Shell.Application")
+'
+' Create a reference to the files and folders in the ZIP file
+  Set objSource = _
+    objShell.Namespace(strZipFilename).Items.Item(CStr(strFilename))
+'
+' Create a reference to the target folder
+  Set objTarget = objShell.Namespace(strDstDir)
+'
+  intOptions = glngcCopyHereDisplayProgressBox
+'
+' UnZIP the files
+  objTarget.CopyHere objSource, intOptions
+'
+' Release the objects
+  Set objSource = Nothing
+  Set objTarget = Nothing
+  Set objShell = Nothing
+'
+  entUnZip1File = 1
+'
+End Function
+'end function
+
+
+
+Sub CountFiles()
+
+
+Dim FolderPath As String, path As String, count As Integer
+FolderPath = "C:\Users\" & insertuserID & "\Desktop\Test References"
+
+path = FolderPath & "\*"
+
+Filename = Dir(path, vbDirectory)
+
+Do While Filename <> ""
+   count = count + 1
+    Filename = Dir()
+Loop
+
+Range("Q8").Value = count
+
+
+Dim sFolderPath As String
+sFolderPath = "C:\Users\" & insertuserID & "\Desktop\Test References"
+If Right(sFolderPath, 1) <> "\" Then
+    sFolderPath = sFolderPath & "\"
+End If
+If Dir(sFolderPath, vbDirectory) <> vbNullString Then
+    MsgBox "Folder exist", vbInformation, "Kutools for Excel"
+Else
+    MsgBox "Folder doesn't exist", vbInformation, "Kutools for Excel"
+End If
+
+Range("T8").Value = Dir(sFolderPath, vbDirectory)
+'MsgBox count & " : files found in folder"
+
+
+
+
+End Sub
+Sub getSubFolder(ByRef prntfld As Object)
+Dim SubFolder As Object
+Dim subfld As Object
+Dim xRow As Long
+For Each SubFolder In prntfld.SubFolders
+    xRow = Range("A1").End(xlDown).Row + 1
+    Cells(xRow, 1).Resize(1, 5).Value = Array(SubFolder.path, Left(SubFolder.path, InStrRev(SubFolder.path, "\")), SubFolder.Name, SubFolder.DateCreated, SubFolder.DateLastModified)
+Next SubFolder
+For Each subfld In prntfld.SubFolders
+    getSubFolder subfld
+Next subfld
+End Sub
+
+Sub Copy_Folder()
+'This example copy all files and subfolders from FromPath to ToPath.
+'Note: If ToPath already exist it will overwrite existing files in this folder
+'if ToPath not exist it will be made for you.
+    Dim FSO As Object
+    Dim FromPath As String
+    Dim ToPath As String
+
+    FromPath = "S:\USATemp-OLD\Node Profile and Menu Item Operations Report\2019"  '<< Change
+    ToPath = "C:\Users\" & insertuserID & "\Desktop\Test References\Another Folder"    '<< Change
+
+    'If you want to create a backup of your folder every time you run this macro
+    'you can create a unique folder with a Date/Time stamp.
+    ToPath = "C:\Users\" & insertuserID & "\Desktop\" & Format(Now, "yyyy-mm-dd h-mm-ss")
+
+    If Right(FromPath, 1) = "\" Then
+        FromPath = Left(FromPath, Len(FromPath) - 1)
+    End If
+
+    If Right(ToPath, 1) = "\" Then
+        ToPath = Left(ToPath, Len(ToPath) - 1)
+    End If
+
+    Set FSO = CreateObject("scripting.filesystemobject")
+
+    If FSO.FolderExists(FromPath) = False Then
+        MsgBox FromPath & " doesn't exist"
+        Exit Sub
+    End If
+
+    FSO.CopyFolder Source:=FromPath, Destination:=ToPath
+    MsgBox "You can find the files and subfolders from " & FromPath & " in " & ToPath
+End Sub
+
+Sub CallAllTogether()
+        'Go to S drive and find most recent folder in NodeProfile
+Application.ScreenUpdating = False
+Dim xPath As String
+Dim xWs As Worksheet
+Dim FSO As Object, j As Long, folder1 As Object, xWb As Workbook
+
+'GetUsername
+Sheets("Macros").Select
+Cells(20, 10).Value = Application.UserLibraryPath
+Range("J20").Select
+Selection.TextToColumns Destination:=Range("J20"), DataType:=xlDelimited, _
+    TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=False, _
+    Semicolon:=False, Comma:=False, Space:=False, Other:=True, OtherChar _
+    :="\", FieldInfo:=Array(Array(1, 1), Array(2, 1), Array(3, 1), Array(4, 1), Array(5, _
+    1), Array(6, 1), Array(7, 1), Array(8, 1)), TrailingMinusNumbers:=True
+
+Dim UserName As String
+UserName = Range("L20").Value
+
+ Rows(20).Select
+ Selection.ClearContents
+
+Range("A1").Select
+
+'Allows you to pick the folder
+'With Application.FileDialog(msoFileDialogFolderPicker)
+'    .Title = "Choose the folder"
+'    .Show
+'End With
+'On Error Resume Next
+'xPath = Application.FileDialog(msoFileDialogFolderPicker).SelectedItems(1) & "\"
+xPath = "S:\USATemp-OLD\Node Profile and Menu Item Operations Report\2019\"
+
+'opens new workbook
+Application.Workbooks.Add
+Set xWs = Application.ActiveSheet
+Set xWb = ActiveWorkbook
+xWs.Cells(1, 1).Value = xPath
+xWs.Cells(2, 1).Resize(1, 5).Value = Array("Path", "Dir", "Name", "Date Created", "Date Last Modified")
+Set FSO = CreateObject("Scripting.FileSystemObject")
+Set folder1 = FSO.getFolder(xPath)
+getSubFolder folder1
+xWs.Cells(2, 1).Resize(1, 5).Interior.Color = 65535
+xWs.Cells(2, 1).Resize(1, 5).EntireColumn.AutoFit
+
+'find column for name
+For i = 1 To 30
+    If Cells(2, i).Value = "Name" Then
+        NameColumn = i
+    Else
+    End If
+Next i
+
+Dim FilesEndRow As Long
+FilesEndRow = xWs.Range("C" & xWs.Rows.count).End(xlUp).Row
+
+Dim Month2 As Integer
+Dim Day2 As Integer
+Dim MonthIter As Integer
+Dim DayIter As Integer
+
+For i = 2 To FilesEndRow
+    If Right(Cells(i, NameColumn).Value, 4) = "2019" Then
+        If Len(Cells(i, NameColumn)) = 7 Then
+        'its thus a month < 10
+            MonthIter = Left(Cells(i, NameColumn).Value, 1)
+            DayIter = Right(Left(Cells(i, NameColumn).Value, 3), 2)
+            Cells(i, 11).Value = 1
+            Cells(i, 12).Value = MonthIter
+            Cells(i, 13).Value = DayIter
+        ElseIf Len(Cells(i, NameColumn)) = 8 Then
+        'its thus a month 10-12
+            MonthIter = Left(Cells(i, NameColumn).Value, 2)
+            DayIter = Right(Left(Cells(i, NameColumn).Value, 4), 2)
+            Cells(i, 12).Value = MonthIter
+            Cells(i, 13).Value = DayIter
+        Else
+        End If
+        Cells(i, 10).Value = 1
+    Else
+    End If
+    If MonthIter > Month2 Then
+        Month2 = MonthIter
+        Day2 = DayIter
+    ElseIf MonthIter = Month2 Then
+        If DayIter >= Day2 Then
+            Day2 = DayIter
+        Else
+        End If
+    Else
+    End If
+Next i
+Cells(1, 12).Value = Month2
+Cells(1, 13).Value = Day2
+'Cells(1, 10).Select
+
+If Len(Cells(1, 12)) = 1 Then
+    MonthString = "0" & Cells(1, 12).Value
+ElseIf Len(Cells(1, 12)) = 2 Then
+    MonthString = Cells(1, 12).Value
+Else
+    MsgBox ("Error. Check file names in folder, Month")
+    Exit Sub
+End If
+
+If Len(Cells(1, 13)) = 1 Then
+    DayString = "0" & Cells(1, 13).Value
+ElseIf Len(Cells(1, 13)) = 2 Then
+    DayString = Cells(1, 13).Value
+Else
+    MsgBox ("Error. Check file names in folder, Day")
+    Exit Sub
+End If
+
+
+
+
+
+'Copy folder to desktop from S drive
+'Dim FSO As Object
+Dim FromPath As String
+Dim ToPath As String
+
+FromPath = "S:\USATemp-OLD\Node Profile and Menu Item Operations Report\2019\" & MonthString & DayString & "2019"  '<< Change
+'ToPath = "C:\Users\" & insertuserID & "\Desktop\Test References\Another Folder"    '<< Change
+
+'If you want to create a backup of your folder every time you run this macro
+'you can create a unique folder with a Date/Time stamp.
+NowTime = Format(Now, "yyyy-mm-dd h-mm-ss")
+ToPath = "C:\Users\" & UserName & "\Desktop\Node Profile" & NowTime
+
+If Right(FromPath, 1) = "\" Then
+    FromPath = Left(FromPath, Len(FromPath) - 1)
+End If
+
+If Right(ToPath, 1) = "\" Then
+    ToPath = Left(ToPath, Len(ToPath) - 1)
+End If
+
+Set FSO = CreateObject("scripting.filesystemobject")
+
+If FSO.FolderExists(FromPath) = False Then
+    MsgBox FromPath & " doesn't exist"
+    Exit Sub
+End If
+
+FSO.CopyFolder Source:=FromPath, Destination:=ToPath
+'MsgBox "You can find the files and subfolders from " & FromPath & " in " & ToPath
+
+
+
+
+
+
+        'Go into now copied over most recent folder and find the node_profile zip
+folder = "C:\Users\" & UserName & "\Desktop\Node Profile" & NowTime & "\"
+file = Dir(folder & "*.zip")
+'file = Dir(folder & "*node_profile")
+'teststring = folder & "test"
+'Cells(13, 1).Value = file
+'Cells(12, 1).Value = teststring
+Do While file <> ""
+    'Debug.Print file
+    'MsgBox file
+    If Left(file, 12) = "node_profile" Then
+        zipfilename = file
+    Else
+    End If
+    file = Dir
+Loop
+
+'Cells(14, 1).Value = folder
+'Cells(15, 1).Value = zipfilename
+
+
+
+
+        'unzip node_profile, save to desktop
+entUnZip1File "C:\Users\" & UserName & "\Desktop\Node Profile" & NowTime & "\" & zipfilename, "C:\Users\" & UserName & "\Desktop\Node Profile" & NowTime, "nodeprofile.csv"
+
+'get dates
+Year1 = Year(Now)
+Month1 = Month(Now)
+Day1 = Day(Now)
+Hour1 = Hour(Now)
+Minute1 = Minute(Now)
+Second1 = Second(Now)
+
+'rename nodeprofile
+'DateString = Month1 & "-" & Day1 & "-" & Year1 & "_" & Hour1 & "." & Minute1 & "." & Second1
+'MsgBox (DateString)
+
+
+'GivenLocation = "C:\Users\mc77217\Desktop\" & NowTime
+'note the trailing backslash
+'OldFileName = "nodeprofile.csv"
+'NewFileName = "nodeprofile" & DateString & ".csv"
+'Name GivenLocation & OldFileName As GivenLocation & NewFileName
+'error is here
+
+
+
+
+
+
+        'open node_profile file from desktop and perform actions
+        
+        
+'uncomment this at the end
+'closes file that was created
+Application.DisplayAlerts = False
+ActiveWorkbook.Close
+Application.DisplayAlerts = True
+
+
+
+
+Application.ScreenUpdating = True
+'MsgBox "You can now find the most recent Node Profile in " & ToPath
+Workbooks.Open Filename:="C:\Users\" & UserName & "\Desktop\Node Profile" & NowTime & "\nodeprofile.csv"
+End Sub
+
+Sub CompareScreensets()
+
+'Unfilters  tab
+Sheets("Node Profile").Select
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim DataSWorksheet As Worksheet, DataStoresEndRow As Long
+Sheets("Master Restaurant List").Select
+Set DataSWorksheet = ActiveSheet
+'Unfilters Master Restaurant List
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+'DataStoresEndRow = DataSWorksheet.Range("E" & DataSWorksheet.Rows.Count).End(xlUp).Row
+
+Dim i As Integer
+Dim j As Integer
+
+
+Dim SCompletionColumn As Integer
+Dim SNSNColumn As Integer
+Dim SNewCoopColumn As Integer
+Dim SLegacyColumn As Integer
+Dim SBaseColumn As Integer
+Dim SStoreCountColumn As Integer
+Dim SUniqueIDColumn As Integer
+Dim SNCNumColumn As Integer
+Dim LastColumnNext As Integer
+Dim SLegacyRegionColumn As Integer
+Dim SBaseRegionColumn As Integer
+
+
+SCompletionColumn = 0
+SNSNColumn = 0
+SNewCoopColumn = 0
+SLegacyColumn = 0
+SBaseColumn = 0
+SStoreCountColumn = 0
+SUniqueIDColumn = 0
+SNCNumColumn = 0
+LastColumnNext = 0
+SLegacyRegionColumn = 0
+SBaseRegionColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        SCompletionColumn = i
+    ElseIf Cells(1, i).Value = "NSN" Then
+        SNSNColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        SNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        SLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        SBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        SStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        SUniqueIDColumn = i
+    ElseIf Cells(1, i).Value = "NC Num" Then
+        SNCNumColumn = i
+    ElseIf Cells(1, i).Value = "Legacy Region" Then
+        SLegacyRegionColumn = i
+    ElseIf Cells(1, i).Value = "Base Region" Then
+        SBaseRegionColumn = i
+    ElseIf Cells(1, i).Value = "" Then
+        LastColumnNext = i
+        Exit For
+    Else
+    End If
+Next i
+
+Dim SLegacyColumnLetter As String
+SLegacyColumnLetter = Split(Cells(1, SLegacyColumn).Address, "$")(1)
+SUniqueIDColumnLetter = Split(Cells(1, SUniqueIDColumn).Address, "$")(1)
+SCompletionColumnLetter = Split(Cells(1, SCompletionColumn).Address, "$")(1)
+SNSNColumnLetter = Split(Cells(1, SNSNColumn).Address, "$")(1)
+
+Dim StoresWorksheet As Worksheet, StoresEndRow As Long
+Set StoresWorksheet = ActiveSheet
+DataStoresEndRow = StoresWorksheet.Range(SLegacyColumnLetter & StoresWorksheet.Rows.count).End(xlUp).Row
+
+
+
+
+
+
+Sheets("Node Profile").Select
+
+'do the same for Node Profile tab
+
+Dim NodeTypeColumn As Integer
+Dim NodeNameColumn As Integer
+Dim NSNColumn As Integer
+Dim StatusColumn As Integer
+Dim ScreensetColumn As Integer
+
+
+
+NodeTypeColumn = 0
+NodeNameColumn = 0
+NSNColumn = 0
+StatusColumn = 0
+ScreensetColumn = 0
+
+
+
+'label column headings
+For i = 1 To 80
+    If Cells(1, i).Value = "NODE TYPE" Then
+        NodeTypeColumn = i
+    ElseIf Cells(1, i).Value = "NODE NAME" Then
+        NodeNameColumn = i
+    ElseIf Cells(1, i).Value = "RESTAURANT NUMBER" Then
+        NSNColumn = i
+    ElseIf Cells(1, i).Value = "STATUS" Then
+        StatusColumn = i
+    ElseIf Cells(1, i).Value = "SCREEN SET" Then
+        ScreensetColumn = i
+    Else
+    End If
+Next i
+
+Dim NodeTypeColumnLetter As String
+NodeTypeColumnLetter = Split(Cells(1, NodeTypeColumn).Address, "$")(1)
+NSNColumnLetter = Split(Cells(1, NSNColumn).Address, "$")(1)
+ScreensetColumnLetter = Split(Cells(1, ScreensetColumn).Address, "$")(1)
+
+
+Dim NodeWorksheet As Worksheet, NodeEndRow As Long
+Set NodeWorksheet = ActiveSheet
+NodeEndRow = NodeWorksheet.Range(NodeTypeColumnLetter & NodeWorksheet.Rows.count).End(xlUp).Row
+
+Dim LastColumnNext1 As Integer
+Dim LastColumnNext2 As Integer
+Dim LastColumnNext3 As Integer
+
+LastColumnNext1 = LastColumnNext + 1
+LastColumnNext2 = LastColumnNext + 2
+LastColumnNext3 = LastColumnNext + 3
+
+'Create Index Match Column for Screensets
+Sheets("Master Restaurant List").Select
+Cells(1, LastColumnNext).Value = "Index Match"
+For i = 2 To DataStoresEndRow
+    On Error Resume Next
+    Cells(i, LastColumnNext).Value = Application.WorksheetFunction.Index(Sheets("Node Profile").Range(ScreensetColumnLetter & "2:" & ScreensetColumnLetter & NodeEndRow), Application.WorksheetFunction.Match(Range(SNSNColumnLetter & i), Sheets("Node Profile").Range(NSNColumnLetter & "2:" & NSNColumnLetter & NodeEndRow), 0), 1)
+    If Err <> 0 Then
+        Cells(i, LastColumnNext).Value = "No Match"
+    Else
+    End If
+    On Error GoTo 0
+Next i
+
+Cells(1, LastColumnNext1).Value = "Consolidated Match"
+For i = 2 To DataStoresEndRow
+    If Cells(i, SCompletionColumn).Value = "Completed" Or IsDate(Cells(i, SCompletionColumn)) Then
+        Cells(i, LastColumnNext1).Value = Cells(i, SBaseRegionColumn).Value
+    Else
+        Cells(i, LastColumnNext1).Value = Cells(i, SLegacyRegionColumn).Value
+    End If
+Next i
+
+
+LastColumnNext2ColumnLetter = Split(Cells(1, LastColumnNext2).Address, "$")(1)
+LastColumnNextColumnLetter = Split(Cells(1, LastColumnNext).Address, "$")(1)
+
+Cells(1, LastColumnNext2).Value = "Compare Screensets"
+Cells(2, LastColumnNext2).Select
+ActiveCell.FormulaR1C1 = "=IF(RC[-1]=RC[-2],""Correct"",""Incorrect"")"
+Selection.AutoFill Destination:=Range(LastColumnNext2ColumnLetter & "2:" & LastColumnNext2ColumnLetter & DataStoresEndRow), Type:=xlFillDefault
+
+Range("P1").Select
+Selection.AutoFilter
+Selection.AutoFilter
+Range(LastColumnNext2ColumnLetter & "1").Select
+ActiveSheet.Range("$A$1:$" & LastColumnNext2ColumnLetter & "$" & DataStoresEndRow).AutoFilter Field:=19, Criteria1:= _
+    "Incorrect"
+    
+    
+Columns(LastColumnNextColumnLetter & ":" & LastColumnNext2ColumnLetter).Select
+Selection.Columns.AutoFit
+
+Cells(1, LastColumnNext2).Select
+
+
+End Sub
+
+
