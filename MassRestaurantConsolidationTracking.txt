@@ -1,0 +1,1503 @@
+Sub RunReport()
+'Calculate New Coops Analyzed
+
+'MsgBox "Analyzing stores to complete report. This may take a moment. Click 'Ok' to continue."
+Application.ScreenUpdating = False
+Application.Calculation = xlCalculationManual
+
+Sheets("Report").Select
+
+'Need to check tabs for filters
+
+'Unfilters Report tab
+Sheets("Report").Select
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim DataSWorksheet As Worksheet, DataStoresEndRow As Long
+Sheets("Master Restaurant List").Select
+Set DataSWorksheet = ActiveSheet
+'Unfilters Master Restaurant List
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+'DataStoresEndRow = DataSWorksheet.Range("E" & DataSWorksheet.Rows.Count).End(xlUp).Row
+
+Dim i As Integer
+Dim j As Integer
+Dim RestaurantCount As Integer
+Dim CompletedCount As Integer
+
+
+
+'top
+
+
+
+'Get Store Measurements
+Sheets("Master Restaurant List").Select
+
+'Unfilters master restaurant stores tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim SCompletionColumn As Integer
+Dim SNewCoopColumn As Integer
+Dim SLegacyColumn As Integer
+Dim SBaseColumn As Integer
+Dim SStoreCountColumn As Integer
+Dim SUniqueIDColumn As Integer
+Dim SNCNumColumn As Integer
+
+
+SCompletionColumn = 0
+SNewCoopColumn = 0
+SLegacyColumn = 0
+SBaseColumn = 0
+SStoreCountColumn = 0
+SUniqueIDColumn = 0
+SNCNumColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        SCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        SNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        SLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        SBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        SStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        SUniqueIDColumn = i
+    ElseIf Cells(1, i).Value = "NC Num" Then
+        SNCNumColumn = i
+    Else
+    End If
+Next i
+
+Dim SLegacyColumnLetter As String
+SLegacyColumnLetter = Split(Cells(1, SLegacyColumn).Address, "$")(1)
+SUniqueIDColumnLetter = Split(Cells(1, SUniqueIDColumn).Address, "$")(1)
+SCompletionColumnLetter = Split(Cells(1, SCompletionColumn).Address, "$")(1)
+
+Dim StoresWorksheet As Worksheet, StoresEndRow As Long
+Set StoresWorksheet = ActiveSheet
+DataStoresEndRow = StoresWorksheet.Range(SLegacyColumnLetter & StoresWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+
+'bottom
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'Measure how many New Coops there are
+
+Dim NCamount As Integer
+NCamount = 10
+
+'old method
+'Sheets("Master Restaurant List").Select
+'For i = 2 To DataStoresEndRow
+'    If Left(Cells(i, SNewCoopColumn).Value, 2) > NCamount Then
+'        NCamount = Left(Cells(i, SNewCoopColumn).Value, 2)
+'    Else
+'    End If
+'Next i
+
+'new method
+
+Sheets("Master Restaurant List").Select
+For i = 2 To DataStoresEndRow
+    If Cells(i, SNCNumColumn).Value = "53A" Then
+    Else
+        If Cells(i, SNCNumColumn).Value > NCamount Then
+            NCamount = Cells(i, SNCNumColumn).Value
+        Else
+        End If
+    End If
+Next i
+        
+
+
+Sheets("Report").Select
+'Insert
+Range("A11").Select
+    ActiveCell.FormulaR1C1 = "TOTAL"
+    Range("A11").Select
+    Selection.Font.Bold = True
+    Range("A11:D11").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent4
+        .TintAndShade = 0.399975585192419
+        .PatternTintAndShade = 0
+    End With
+Range("A11").Select
+
+    Range("A11:D" & (12 + NCamount + 1)).Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Range("A11:D11").Select
+    Range("D11").Activate
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("D11").Select
+    
+Cells(11, 2).Value = 0
+Dim TotalRest As Integer
+TotalRest = 1
+Dim Percent1 As Long
+Percent1 = 0
+Dim CompletedTotal As Integer
+CompletedTotal = 0
+Dim BaseCount As Integer
+BaseCount = 0
+Dim TotalBase As Long
+TotalBase = 0
+Dim Otheri As String
+
+For i = 1 To NCamount + 1
+    Otheri = i
+    Cells(12 + i, 1).Value = Otheri
+    If i = NCamount + 1 Then
+        Cells(12 + i, 1).Value = "53A"
+    Else
+    End If
+Next i
+
+Sheets("Master Restaurant List").Select
+For i = 1 To NCamount + 1
+    RestaurantCount = 0
+    CompletedCount = 0
+    BaseCount = 0
+    Otheri = i
+    Sheets("Master Restaurant List").Select
+    If i = NCamount + 1 Then
+        Otheri = "53A"
+    Else
+    End If
+    For j = 2 To DataStoresEndRow
+    'If New Coop less than 10, e.g. starting with 0
+        '
+        '
+        'New system with independent NC Num Column
+            If Cells(j, SNCNumColumn).Value = Otheri Then
+                RestaurantCount = RestaurantCount + 1
+                If Cells(j, SLegacyColumn).Value = Cells(j, SBaseColumn).Value Then
+                    BaseCount = BaseCount + 1
+                Else
+                End If
+                If Cells(j, SCompletionColumn).Value = "Completed" Or IsDate(Cells(j, SCompletionColumn)) Then
+                    'add 1 to comp count
+                    CompletedCount = CompletedCount + 1
+                Else
+                End If
+            Else
+            End If
+        '
+        '
+        'Old system with NC Long Column. Obsolete
+        'If number has a zero in front, e.g. less than 10
+        '    If Left(Cells(j, SNewCoopColumn).Value, 1) = 0 Then
+        '        If Right(Left(Cells(j, SNewCoopColumn).Value, 2), 1) = i Then
+        '        'add 1 to rest count
+        '            RestaurantCount = RestaurantCount + 1
+        '            If Cells(j, SCompletionColumn).Value = "Completed" Or IsDate(Cells(j, SCompletionColumn)) Then
+        '            'add 1 to comp count
+        '                CompletedCount = CompletedCount + 1
+        '            Else
+        '            End If
+        '        Else
+        '        End If
+        '    Else
+        '    'If 10 or greater
+        '        If Left(Cells(j, SNewCoopColumn).Value, 2) = i Then
+        '            RestaurantCount = RestaurantCount + 1
+        '            If Cells(j, SCompletionColumn).Value = "Completed" Or IsDate(Cells(j, SCompletionColumn)) Then
+        '                CompletedCount = CompletedCount + 1
+        '            Else
+        '            End If
+        '        Else
+        '        End If
+        '    End If
+    Next j
+    Sheets("Report").Select
+    
+    'Used to set values to 'Consolidated to Base'
+    If RestaurantCount = 0 Then
+        Cells(12 + i, 2).Value = 0
+        Cells(12 + i, 4).Value = 1
+        Cells(12 + i, 3).Value = 0
+    Else
+        Cells(12 + i, 2).Value = RestaurantCount
+        Cells(12 + i, 4).Value = (CompletedCount / RestaurantCount)
+        Cells(12 + i, 3).Value = RestaurantCount - CompletedCount
+    End If
+    
+    TotalRest = TotalRest + RestaurantCount
+    TotalBase = TotalBase + BaseCount
+    Cells(11, 2).Value = TotalRest
+    CompletedTotal = CompletedTotal + CompletedCount
+    'Some tests
+    'Cells(1, 14).Value = CompletedTotal
+    'Cells(2, 14).Value = TotalBase
+    'Cells(3, 14).Value = TotalRest
+    
+    Cells(11, 4).Value = ((CompletedTotal - TotalBase) / (TotalRest - TotalBase))
+    Cells(11, 3).Value = TotalRest - CompletedTotal
+    
+Next i
+
+    Range("B12").Select
+    ActiveCell.FormulaR1C1 = "Number Restaurants"
+    Range("C12").Select
+    ActiveCell.FormulaR1C1 = "Number Remaining"
+    Range("D12").Select
+    ActiveCell.FormulaR1C1 = "% Completed"
+    Range("C13").Select
+
+
+'FORMATTING
+
+Range("A12").Select
+    ActiveCell.FormulaR1C1 = "New Coop Number"
+    Columns("A:A").Select
+    Range("A2").Activate
+    Selection.Columns.AutoFit
+    Columns("B:D").Select
+    Range("B9").Activate
+    Selection.Columns.AutoFit
+
+ 
+    Range("D12:D" & (12 + NCamount + 1)).Select
+    Selection.Style = "Percent"
+    Range("A12:D12").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Selection.Borders(xlEdgeRight).LineStyle = xlNone
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("A12").Select
+
+    Range("A11:A" & (12 + NCamount + 1)).Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    Selection.Borders(xlEdgeBottom).LineStyle = xlNone
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Range("A12:D12").Select
+    Selection.Font.Bold = True
+    Range("C12").Select
+  
+  'Conditional Formatting
+    Range("D13:D" & (12 + NCamount + 1)).Select
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=1"
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16752384
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13561798
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+    
+    Range("C13:C" & (12 + NCamount + 1)).Select
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=0"
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16752384
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13561798
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+    
+    Range("F10").Select
+    
+    Range("D11").Select
+    Selection.Style = "Percent"
+    Range("A11").Select
+
+    Range("A11:A" & (12 + NCamount + 1)).Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+   
+    Range("B11:C11").Select
+    Selection.Style = "Comma"
+    Selection.NumberFormat = "_(* #,##0.000_);_(* (#,##0.000);_(* ""-""??_);_(@_)"
+    Selection.NumberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+    Selection.NumberFormat = "_(* #,##0.0_);_(* (#,##0.0);_(* ""-""??_);_(@_)"
+    Selection.NumberFormat = "_(* #,##0_);_(* (#,##0);_(* ""-""??_);_(@_)"
+    Range("A12:D12").Select
+    Range("D12").Activate
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    
+     
+    ActiveWindow.SmallScroll Up:=1
+    Rows("13:13").Select
+    ActiveWindow.FreezePanes = True
+    Range("A11").Select
+     With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+
+    Range("A2").Select
+    
+    Range("A13").Select
+Sheets("Report").Select
+
+
+Cells(5, 3).Value = (CompletedTotal) / (TotalRest)
+
+'Cells(4, 3).Value
+Cells(4, 3).Value = Cells(11, 2).Value - Cells(11, 3).Value
+Cells(7, 3).Value = Cells(4, 3).Value / Cells(8, 8).Value
+Cells(8, 3).Value = Cells(11, 3).Value / Cells(8, 8).Value
+
+
+    Range("C2:D2").Select
+    'Selection.Style = "Percent"
+    Range("C7:D7").Select
+    Selection.NumberFormat = "0"
+    Range("C8:D8").Select
+    Selection.NumberFormat = "0"
+    Range("C9:D9").Select
+    Selection.NumberFormat = "0"
+    Range("A1:D1").Select
+
+Dim NewCoopCompleteCount As Integer
+NewCoopCompleteCount = 0
+For i = 1 To NCamount + 1
+    If Cells(12 + i, 4).Value = 1 Then
+        NewCoopCompleteCount = NewCoopCompleteCount + 1
+    Else
+    End If
+Next i
+
+Cells(2, 3).Value = NewCoopCompleteCount
+
+'top
+
+
+
+Sheets("Coop Consolidation Tracker").Select
+
+Dim CCompletionColumn As Integer
+Dim CNewCoopColumn As Integer
+Dim CLegacyColumn As Integer
+Dim CBaseColumn As Integer
+Dim CStoreCountColumn As Integer
+Dim CUniqueIDColumn As Integer
+
+CCompletionColumn = 0
+CNewCoopColumn = 0
+CLegacyColumn = 0
+CBaseColumn = 0
+CStoreCountColumn = 0
+CUniqueIDColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        CCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        CNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        CLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        CBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        CStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        CUniqueIDColumn = i
+    Else
+    End If
+Next i
+
+Dim CLegacyColumnLetter As String
+CLegacyColumnLetter = Split(Cells(1, CLegacyColumn).Address, "$")(1)
+CUniqueIDColumnLetter = Split(Cells(1, CUniqueIDColumn).Address, "$")(1)
+
+Dim DataCoopWorksheet As Worksheet, DataCoopsEndRow As Long
+Set DataCoopWorksheet = ActiveSheet
+DataCoopsEndRow = DataCoopWorksheet.Range(CLegacyColumnLetter & DataCoopWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+
+
+'bottom
+
+
+'Unfilters Coops tab
+Sheets("Coop Consolidation Tracker").Select
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim LegacyCoopCompleteCount As Integer
+
+
+LegacyCoopCompleteCount = 0
+For i = 2 To DataCoopsEndRow
+    If Cells(i, CCompletionColumn).Value = "Completed" Or IsDate(Cells(i, CCompletionColumn)) Or Cells(i, CCompletionColumn).Value = "Complete" Then
+        LegacyCoopCompleteCount = LegacyCoopCompleteCount + 1
+    Else
+    End If
+Next i
+    
+    
+Sheets("Report").Select
+'Right align 53A
+Range("A" & 12 + NCamount + 1).Select
+    With Selection
+        .HorizontalAlignment = xlRight
+        .VerticalAlignment = xlBottom
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+Cells(3, 3).Value = LegacyCoopCompleteCount
+Cells(9, 3).Value = Cells(7, 3).Value + Cells(8, 3).Value
+
+Range("A1").Select
+    
+Application.Calculation = xlCalculationAutomatic
+Application.ScreenUpdating = True
+MsgBox "Report succesfully generated.", , "Done"
+
+End Sub
+
+
+Sub UpdatedCompletedStores()
+'
+' Updates completed stores in Master Restaurant List based on Input Completed Stores
+'
+
+'
+'MsgBox "Updating Completed Stores. Click 'Ok' to continue"
+Application.ScreenUpdating = False
+Sheets("Input Completed Stores").Select
+'Unfilters Input stores tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim i As Integer
+
+
+
+Dim NSNColumn As Integer
+Dim CompletedByColumn As Integer
+Dim DateCompletedColumn As Integer
+
+CompletedByColumn = 0
+DateCompletedColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completed By" Then
+        CompletedByColumn = i
+    ElseIf Cells(1, i).Value = "Date Completed" Or Cells(1, i).Value = "Completion Date" Then
+        DateCompletedColumn = i
+    ElseIf Cells(1, i).Value = "NSN" Then
+        NSNColumn = i
+    Else
+    End If
+Next i
+
+
+
+
+
+
+
+
+'raise error if columns not labeled correctly
+If CompletedByColumn = 0 Then
+    Application.ScreenUpdating = True
+    MsgBox "Error. Please make sure the column with who completed the store is labeled as ""Completed By"""
+    Exit Sub
+ElseIf DateCompletedColumn = 0 Then
+    Application.ScreenUpdating = True
+    MsgBox "Error. Please make sure the column with the day the store was completed is labeled as ""Date Completed"" or ""Completion Date"""
+    Exit Sub
+ElseIf NSNColumn = 0 Then
+    Application.ScreenUpdating = True
+    MsgBox "Error. Please make sure the column with the store number is labeled as ""NSN"""
+    Exit Sub
+End If
+    '
+    '
+    '
+    '
+    
+'Measure row length based on NSN column
+NSNColumnLetter = Split(Cells(1, NSNColumn).Address, "$")(1)
+Dim InputStoresWorksheet As Worksheet, InputStoresEndRow As Long
+Set InputStoresWorksheet = ActiveSheet
+InputStoresEndRow = InputStoresWorksheet.Range(NSNColumnLetter & InputStoresWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+
+Dim NSNnumber As Long
+Dim CompletedBy As String
+Dim DateCompleted As Date
+Dim j As Integer
+Dim OneIfFound As Integer
+Dim SNCNumColumn As Integer
+
+Sheets("Master Restaurant List").Select
+Dim MasterStoresWorksheet As Worksheet, MasterStoresEndRow As Long
+Set MasterStoresWorksheet = ActiveSheet
+'Unfilters Restaurant List tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+MasterStoresEndRow = MasterStoresWorksheet.Range("C" & MasterStoresWorksheet.Rows.Count).End(xlUp).Row
+
+
+SCompletionColumn = 0
+SNewCoopColumn = 0
+SLegacyColumn = 0
+SBaseColumn = 0
+SStoreCountColumn = 0
+SUniqueIDColumn = 0
+SNSN = 0
+SCompletedBy = 0
+SNCNumColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        SCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        SNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        SLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        SBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        SStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        SUniqueIDColumn = i
+    ElseIf Cells(1, i).Value = "NSN" Then
+        SNSN = i
+    ElseIf Cells(1, i).Value = "Completed By" Then
+        SCompletedBy = i
+    ElseIf Cells(1, i).Value = "NC Num" Then
+        SNCNumColumn = i
+    Else
+    End If
+Next i
+
+
+Sheets("Input Completed Stores").Select
+Cells(1, 15).Value = NSNColumn
+Cells(1, 16).Value = CompletedByColumn
+Cells(1, 17).Value = DateCompletedColumn
+
+'Dim d
+'Set d = CreateObject("Scripting.Dictionary")
+
+'Need to add in condition if completion date isn't a date
+Cells(1, 22).Value = InputStoresEndRow
+If InputStoresEndRow = 1 Then
+    Exit Sub
+Else
+End If
+
+For i = 2 To InputStoresEndRow
+    Sheets("Input Completed Stores").Select
+    NSNnumber = Cells(i, NSNColumn).Value
+    Cells(2, 15).Value = NSNnumber
+    CompletedBy = Cells(i, CompletedByColumn).Value
+    Cells(2, 16).Value = CompletedBy
+    If IsDate(Cells(i, DateCompletedColumn).Value) Then
+        DateCompleted = Cells(i, DateCompletedColumn).Value
+    Else
+        Application.ScreenUpdating = True
+        MsgBox "Error in Row " & i & ". Please make sure the Completion Date value is a date."
+        Exit Sub
+    End If
+    Cells(2, 17).Value = DateCompleted
+    Cells(2, 19).Value = i
+    Sheets("Master Restaurant List").Select
+    OneIfFound = 0
+    For j = 2 To MasterStoresEndRow
+        If Cells(j, SNSN).Value = NSNnumber Then
+            Cells(j, SCompletionColumn).Value = DateCompleted
+            Cells(j, SCompletedBy).Value = CompletedBy
+            Sheets("Input Completed Stores").Select
+            Cells(2, 20).Value = j
+            Sheets("Master Restaurant List").Select
+            OneIfFound = 1
+        Else
+        End If
+    Next j
+    'If OneIfFound = 0 Then
+     '   d.Add i, NSNnumber
+    'Else
+    'End If
+Next i
+
+
+
+
+
+Sheets("Input Completed Stores").Select
+If InputStoresEndRow > 1 Then
+    Range("A2:P" & InputStoresEndRow).Select
+    Selection.ClearContents
+Else
+End If
+
+Range("O1:T4").Select
+Selection.ClearContents
+Range("A2").Select
+
+Sheets("Input Completed Stores").Select
+
+
+'The following section prints out a list of stores that weren't found, if any
+'To note, this only works on Windows versions of Excel, not Mac, and is thus commented out for my team's use. This includes the commented lines above in this fucntion that use the vaariable d
+'Dim a
+'Dim b
+'a = d.Items
+'b = d.Keys
+
+'Dim c
+'Set c = CreateObject("Scripting.Dictionary")
+'c.Add "One", "test"
+'c.Add "Two", "testtwo"
+'c.Add 50, "testthree"
+'c.Add 100, 30
+
+'Dim dictstring As String
+
+'Used if stores not found. Doesn't work on Mac
+'
+'If d.Count > 0 Then
+'    For Each Key In d.Keys
+ '       dictstring = dictstring + " " & d(Key)
+'        Debug.Print dictstring
+'    Next
+'    MsgBox ("Stores in Master Restaurant List have been updated. The following stores were not found: " & dictstring)
+'    Exit Sub
+'Else
+'
+'End If
+
+Application.ScreenUpdating = True
+    
+'MsgBox ("Stores in Master Restaurant List have been updated.")
+
+
+End Sub
+
+Sub UpdateCompletedCoops()
+
+
+'MsgBox "Updating Completed Coops. Click 'Ok' to continue."
+Application.ScreenUpdating = False
+
+
+Dim CoopsWorksheet As Worksheet, CoopsEndRow As Long
+Sheets("Coop Consolidation Tracker").Select
+Set CoopsWorksheet = ActiveSheet
+
+'Unfilters Coops tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim CCompletionColumn As Integer
+Dim CNewCoopColumn As Integer
+Dim CLegacyColumn As Integer
+Dim CBaseColumn As Integer
+Dim CStoreCountColumn As Integer
+Dim CUniqueIDColumn As Integer
+
+CCompletionColumn = 0
+CNewCoopColumn = 0
+CLegacyColumn = 0
+CBaseColumn = 0
+CStoreCountColumn = 0
+CUniqueIDColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        CCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        CNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        CLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        CBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        CStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        CUniqueIDColumn = i
+    ElseIf Cells(1, i).Value = "Percent Consolidated" Then
+        CPercentConsolidated = i
+    Else
+    End If
+Next i
+
+Dim CLegacyColumnLetter As String
+CLegacyColumnLetter = Split(Cells(1, CLegacyColumn).Address, "$")(1)
+CUniqueIDColumnLetter = Split(Cells(1, CUniqueIDColumn).Address, "$")(1)
+
+CoopsEndRow = CoopsWorksheet.Range(CLegacyColumnLetter & CoopsWorksheet.Rows.Count).End(xlUp).Row
+
+'NOW STORES
+
+
+'Get Store Measurements
+Sheets("Master Restaurant List").Select
+
+'Unfilters master restaurant stores tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim SCompletionColumn As Integer
+Dim SNewCoopColumn As Integer
+Dim SLegacyColumn As Integer
+Dim SBaseColumn As Integer
+Dim SStoreCountColumn As Integer
+Dim SUniqueIDColumn As Integer
+Dim SPercentConsolidated As Integer
+
+
+SCompletionColumn = 0
+SNewCoopColumn = 0
+SLegacyColumn = 0
+SBaseColumn = 0
+SStoreCountColumn = 0
+SUniqueIDColumn = 0
+SPercentConsolidated = 0
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        SCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        SNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        SLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        SBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        SStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        SUniqueIDColumn = i
+    Else
+    End If
+Next i
+
+'just some tests
+'Cells(2, 15).Value = SCompletionColumn
+'Cells(3, 15).Value = SNewCoopColumn
+'Cells(4, 15).Value = SLegacyColumn
+'Cells(5, 15).Value = SBaseColumn
+'Cells(6, 15).Value = SStoreCountColumn
+'Cells(7, 15).Value = SUniqueIDColumn
+
+Dim SLegacyColumnLetter As String
+SLegacyColumnLetter = Split(Cells(1, SLegacyColumn).Address, "$")(1)
+SUniqueIDColumnLetter = Split(Cells(1, SUniqueIDColumn).Address, "$")(1)
+SCompletionColumnLetter = Split(Cells(1, SCompletionColumn).Address, "$")(1)
+
+Dim StoresWorksheet As Worksheet, StoresEndRow As Long
+Set StoresWorksheet = ActiveSheet
+StoresEndRow = StoresWorksheet.Range(SLegacyColumnLetter & StoresWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+Sheets("Coop Consolidation Tracker").Select
+
+
+
+Dim LastColumn As Integer
+
+'measure far right column + 1
+For i = 1 To 30
+    If Cells(1, i).Value = "" Then
+        LastColumn = i
+        Exit For
+    Else
+    End If
+Next i
+'convert lastcolumn to letter
+Dim LastColumnLetter As String
+LastColumnLetter = Split(Cells(1, LastColumn).Address, "$")(1)
+
+'for loop
+For i = 2 To CoopsEndRow
+
+    UniqueID = Cells(i, CUniqueIDColumn).Value
+
+    Sheets("Master Restaurant List").Select
+    SCompletedCount = Application.WorksheetFunction.CountIfs(Range(SUniqueIDColumnLetter & "2:" & SUniqueIDColumnLetter & StoresEndRow), "=" & UniqueID, Range(SCompletionColumnLetter & "2:" & SCompletionColumnLetter & StoresEndRow), "Completed") + Application.WorksheetFunction.CountIfs(Range(SUniqueIDColumnLetter & "2:" & SUniqueIDColumnLetter & StoresEndRow), "=" & UniqueID, Range(SCompletionColumnLetter & "2:" & SCompletionColumnLetter & StoresEndRow), ">1/1/1900")
+    
+    'wow this method is immensely more simple I'm glad I did this
+
+    Sheets("Coop Consolidation Tracker").Select
+
+    If SCompletedCount = Cells(i, CStoreCountColumn).Value Then
+        Cells(i, CCompletionColumn).Value = "Completed"
+    ElseIf SCompletedCount < Cells(i, CStoreCountColumn).Value Then
+        Cells(i, CCompletionColumn).Value = ""
+    End If
+    'COME BACK 2 DIS
+    Cells(i, CPercentConsolidated).Value = (SCompletedCount / Cells(i, CStoreCountColumn).Value)
+    
+Next i
+
+Range("A1").Select
+
+
+
+Application.ScreenUpdating = True
+'MsgBox "Coop Completion Status has been updated"
+
+
+End Sub
+
+Sub CallCoopStoreUpdate()
+
+Application.Calculation = xlCalculationManual
+
+Call UpdatedCompletedStores
+Call UpdateCompletedCoops
+
+Application.Calculation = xlCalculationAutomatic
+End Sub
+
+
+Sub RunAll()
+Application.Calculation = xlCalculationManual
+
+Call UpdatedCompletedStores
+Call UpdateCompletedCoops
+Call RunReport
+
+Application.Calculation = xlCalculationAutomatic
+
+End Sub
+
+Sub ValidateData()
+
+Application.ScreenUpdating = False
+
+'Get Coop Measurements
+Dim i As Integer
+Sheets("Coop Consolidation Tracker").Select
+'Unfilters Coops tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim CCompletionColumn As Integer
+Dim CNewCoopColumn As Integer
+Dim CLegacyColumn As Integer
+Dim CBaseColumn As Integer
+Dim CStoreCountColumn As Integer
+Dim CUniqueIDColumn As Integer
+
+CCompletionColumn = 0
+CNewCoopColumn = 0
+CLegacyColumn = 0
+CBaseColumn = 0
+CStoreCountColumn = 0
+CUniqueIDColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        CCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        CNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        CLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        CBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        CStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        CUniqueIDColumn = i
+    Else
+    End If
+Next i
+
+Dim CLegacyColumnLetter As String
+CLegacyColumnLetter = Split(Cells(1, CLegacyColumn).Address, "$")(1)
+CUniqueIDColumnLetter = Split(Cells(1, CUniqueIDColumn).Address, "$")(1)
+
+Dim CoopsWorksheet As Worksheet, CoopsEndRow As Long
+Set CoopsWorksheet = ActiveSheet
+CoopsEndRow = CoopsWorksheet.Range(CLegacyColumnLetter & CoopsWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+
+'Get Store Measurements
+Sheets("Master Restaurant List").Select
+
+'Unfilters master restaurant stores tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim SCompletionColumn As Integer
+Dim SNewCoopColumn As Integer
+Dim SLegacyColumn As Integer
+Dim SBaseColumn As Integer
+Dim SStoreCountColumn As Integer
+Dim SUniqueIDColumn As Integer
+
+SCompletionColumn = 0
+SNewCoopColumn = 0
+SLegacyColumn = 0
+SBaseColumn = 0
+SStoreCountColumn = 0
+SUniqueIDColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        SCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        SNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        SLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        SBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        SStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        SUniqueIDColumn = i
+    Else
+    End If
+Next i
+
+Dim SLegacyColumnLetter As String
+SLegacyColumnLetter = Split(Cells(1, SLegacyColumn).Address, "$")(1)
+SUniqueIDColumnLetter = Split(Cells(1, SUniqueIDColumn).Address, "$")(1)
+SCompletionColumnLetter = Split(Cells(1, SCompletionColumn).Address, "$")(1)
+
+Dim StoresWorksheet As Worksheet, StoresEndRow As Long
+Set StoresWorksheet = ActiveSheet
+StoresEndRow = StoresWorksheet.Range(SLegacyColumnLetter & StoresWorksheet.Rows.Count).End(xlUp).Row
+
+'Okay dimensioning done for now
+'
+'
+
+
+
+
+
+'Check storecounts on restaurants tab by UniqueID
+Sheets("Master Restaurant List").Select
+Dim SStoreCount As Integer
+Dim UniqueID As Integer
+For i = 2 To StoresEndRow
+    UniqueID = Cells(i, SUniqueIDColumn).Value
+    SStoreCount = Application.WorksheetFunction.CountIf(Range(SUniqueIDColumnLetter & "2:" & SUniqueIDColumnLetter & StoresEndRow), "=" & UniqueID)
+    If SStoreCount = Cells(i, SStoreCountColumn).Value Then
+    Else
+        LegacyCoop = Cells(i, SLegacyColumn).Value
+        Rows(i).Select
+        MsgBox "Incorrect Store Count on 'Master Restaurant List' tab. Error was found in Row " & (i) & " for Legacy Coop " & LegacyCoop & ". Store Count is listed as " & Cells(i, SStoreCountColumn).Value & " but the actual Store Count is " & SStoreCount & "."
+        Exit Sub
+    'If want to highlight tha bad one
+       ' Range(SUniqueIDColumnLetter & i).Select
+        'With Selection.Interior
+       ' .Pattern = xlSolid
+       ' .PatternColorIndex = xlAutomatic
+       ' .Color = 255
+       ' .TintAndShade = 0
+      ' .PatternTintAndShade = 0
+       ' End With
+    End If
+Next i
+
+'Sheets("Report").Select
+'Range("E13").Value = SStoreCount
+
+
+'ways to do completed store count
+'go line by line on coops, then line by line on stores adding up completed ones
+'go line by line on coop and use countif vba style
+Dim TestForMatch As Integer
+
+
+Sheets("Coop Consolidation Tracker").Select
+'Dim CStoreCount As Integer
+'Dim j As Integer
+'Check storecounts, legacy, base coops on coops tab by UniqueID, also
+'Verify each uniqueID's legacy/base on resturant is paired with the correct uniqueID on Coop
+For i = 2 To CoopsEndRow
+    UniqueID = Cells(i, CUniqueIDColumn).Value
+    CStoreCount = Cells(i, CStoreCountColumn).Value
+    CNewCoop = Cells(i, CNewCoopColumn).Value
+    CLegacyCoop = Cells(i, CLegacyColumn).Value
+    CBaseCoop = Cells(i, CBaseColumn).Value
+    CCompletionStatus = Cells(i, CCompletionColumn).Value
+    TestForMatch = 0
+    Sheets("Master Restaurant List").Select
+    For j = 2 To StoresEndRow
+        If Cells(j, SUniqueIDColumn).Value = UniqueID Then
+            TestForMatch = 1
+            If CStoreCount = Cells(j, SStoreCountColumn).Value And CLegacyCoop = Cells(j, SLegacyColumn).Value And CBaseCoop = Cells(j, SBaseColumn).Value And CNewCoop = Cells(j, SNewCoopColumn).Value Then
+                Exit For
+            Else
+                'More specific error
+                'updates store count on CC tracker tab
+                'this is the only part that actually changes the data as of now
+                If CStoreCount <> Cells(j, SStoreCountColumn).Value Then
+                    StoreCountTemp = Cells(j, SStoreCountColumn).Value
+                    Sheets("Coop Consolidation Tracker").Select
+                    Cells(i, CStoreCountColumn).Value = StoreCountTemp
+                    Rows(j).Select
+                    Sheets("Coop Consolidation Tracker").Select
+                    Rows(i).Select
+                    MsgBox "Error found and fixed in Row " & i & " on Coop Consolidation Tracker tab referencing Row " & j & " on Master Restaurant List. Store Count was listed as " & CStoreCount & " but has been updated to " & StoreCountTemp & "."
+                    Exit Sub
+                'can add more specific errors besides just store count
+                Else
+                End If
+                Rows(j).Select
+                Sheets("Coop Consolidation Tracker").Select
+                Rows(i).Select
+                MsgBox "Error. Incorrect data found in Row " & i & " on 'Coop Consolidation Tracker' tab referencing Row " & j & " in 'Master Restaurant List' tab."
+                Exit Sub
+            End If
+        Else
+        End If
+    Next j
+    If TestForMatch = 0 Then
+        MsgBox "Error found in Row " & i & " of the Coop Consolidation Tracker. UniqueID " & UniqueID & " on Coop Consolidation Tracker could not find a match in the Master Restaurant List."
+        Sheets("Coop Consolidation Tracker").Select
+        Rows(i).Select
+        Exit Sub
+    Else
+    End If
+    Sheets("Coop Consolidation Tracker").Select
+Next i
+
+
+
+
+
+
+
+
+'check that completed coops are correct
+'Make sure stores aren't filtered
+Sheets("Coop Consolidation Tracker").Select
+For i = 2 To CoopsEndRow
+    UniqueID = Cells(i, CUniqueIDColumn).Value
+    CCompletion = Cells(i, CCompletionColumn).Value
+    'Cells(i, 21).Value = UniqueID
+    'Cells(i, 22).Value = CCompletion
+    Sheets("Master Restaurant List").Select
+    SCompletedCount = Application.WorksheetFunction.CountIfs(Range(SUniqueIDColumnLetter & "2:" & SUniqueIDColumnLetter & StoresEndRow), "=" & UniqueID, Range(SCompletionColumnLetter & "2:" & SCompletionColumnLetter & StoresEndRow), "Completed") + Application.WorksheetFunction.CountIfs(Range(SUniqueIDColumnLetter & "2:" & SUniqueIDColumnLetter & StoresEndRow), "=" & UniqueID, Range(SCompletionColumnLetter & "2:" & SCompletionColumnLetter & StoresEndRow), ">1/1/1900")
+    Sheets("Coop Consolidation Tracker").Select
+    'Cells(i, 23).Value = SUniqueIDColumnLetter
+    'Cells(i, 24).Value = StoresEndRow
+    'Cells(i, 25).Value = SCompletionColumnLetter
+    'Cells(i, 20).Value = SCompletedCount
+    If Cells(i, CCompletionColumn).Value = "Completed" And Cells(i, CStoreCountColumn).Value = SCompletedCount Then
+    ElseIf Cells(i, CCompletionColumn).Value = "Completed" Then
+        Rows(i).Select
+        MsgBox "Data Error. Row " & i & " says 'Completed' but only " & SCompletedCount & " of the " & Cells(i, CStoreCountColumn).Value & " stores have been completed."
+        Exit Sub
+    ElseIf Cells(i, CStoreCountColumn).Value = SCompletedCount Then
+        Rows(i).Select
+        MsgBox "Data Error. Row " & i & " does not say 'Completed' but all of the " & SCompletedCount & " stores have been completed."
+        Exit Sub
+    Else
+    End If
+    'Cells(i, 19).Value = SCompletedCount2
+Next i
+
+
+
+'potential other validations
+
+'Check storecounts on restaurants tab by NewCoop?
+
+'check that total stores are the same
+
+Sheets("Report").Select
+Application.ScreenUpdating = True
+MsgBox "Data is valid. Today is a good day :)"
+
+End Sub
+
+Sub CoopStoreCount()
+
+'FYI NEVER FINISHED THIS
+'
+'Is meant to update store count
+'
+'
+'
+'
+
+
+'Get Coop Measurements
+Dim i As Integer
+Sheets("Coop Consolidation Tracker").Select
+'Unfilters Coops tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim CCompletionColumn As Integer
+Dim CNewCoopColumn As Integer
+Dim CLegacyColumn As Integer
+Dim CBaseColumn As Integer
+Dim CStoreCountColumn As Integer
+Dim CUniqueIDColumn As Integer
+
+CCompletionColumn = 0
+CNewCoopColumn = 0
+CLegacyColumn = 0
+CBaseColumn = 0
+CStoreCountColumn = 0
+CUniqueIDColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        CCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        CNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp Number" Then
+        CNewCoopNumColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        CLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        CBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        CStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        CUniqueIDColumn = i
+    Else
+    End If
+Next i
+
+Dim CLegacyColumnLetter As String
+CLegacyColumnLetter = Split(Cells(1, CLegacyColumn).Address, "$")(1)
+CUniqueIDColumnLetter = Split(Cells(1, CUniqueIDColumn).Address, "$")(1)
+
+Dim CoopsWorksheet As Worksheet, CoopsEndRow As Long
+Set CoopsWorksheet = ActiveSheet
+CoopsEndRow = CoopsWorksheet.Range(CLegacyColumnLetter & CoopsWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+
+'Get Store Measurements
+Sheets("Master Restaurant List").Select
+
+'Unfilters master restaurant stores tab
+If ActiveSheet.AutoFilterMode Then 'autofilter is 'on'
+   On Error Resume Next   'turn off error reporting
+   ActiveSheet.ShowAllData
+   On Error GoTo 0   'turn error reporting back on
+End If
+
+
+Dim SCompletionColumn As Integer
+Dim SNewCoopColumn As Integer
+Dim SLegacyColumn As Integer
+Dim SBaseColumn As Integer
+Dim SStoreCountColumn As Integer
+Dim SUniqueIDColumn As Integer
+
+SCompletionColumn = 0
+SNewCoopColumn = 0
+SLegacyColumn = 0
+SBaseColumn = 0
+SStoreCountColumn = 0
+SUniqueIDColumn = 0
+
+
+'label column headings
+For i = 1 To 30
+    If Cells(1, i).Value = "Completion Date" Then
+        SCompletionColumn = i
+    ElseIf Cells(1, i).Value = "New CoOp" Then
+        SNewCoopColumn = i
+    ElseIf Cells(1, i).Value = "Legacy CoOp" Then
+        SLegacyColumn = i
+    ElseIf Cells(1, i).Value = "Base CoOp" Then
+        SBaseColumn = i
+    ElseIf Cells(1, i).Value = "Store Count" Then
+        SStoreCountColumn = i
+    ElseIf Cells(1, i).Value = "Unique ID" Then
+        SUniqueIDColumn = i
+    Else
+    End If
+Next i
+
+Dim SLegacyColumnLetter As String
+SLegacyColumnLetter = Split(Cells(1, SLegacyColumn).Address, "$")(1)
+SUniqueIDColumnLetter = Split(Cells(1, SUniqueIDColumn).Address, "$")(1)
+SCompletionColumnLetter = Split(Cells(1, SCompletionColumn).Address, "$")(1)
+
+Dim StoresWorksheet As Worksheet, StoresEndRow As Long
+Set StoresWorksheet = ActiveSheet
+StoresEndRow = StoresWorksheet.Range(SLegacyColumnLetter & StoresWorksheet.Rows.Count).End(xlUp).Row
+
+
+
+Sheets("Coop Consolidation Tracker").Select
+'Dim CStoreCount As Integer
+'Dim j As Integer
+'Check storecounts, legacy, base coops on coops tab by UniqueID, also
+'Verify each uniqueID's legacy/base on resturant is paired with the correct uniqueID on Coop
+For i = 2 To CoopsEndRow
+    UniqueID = Cells(i, CUniqueIDColumn).Value
+    CStoreCount = Cells(i, CStoreCountColumn).Value
+    CNewCoop = Cells(i, CNewCoopColumn).Value
+    CNCNumber = Cells(i, CNewCoopNumColumn).Value
+    CLegacyCoop = Cells(i, CLegacyColumn).Value
+    CBaseCoop = Cells(i, CBaseColumn).Value
+    CCompletionStatus = Cells(i, CCompletionColumn).Value
+    Sheets("Master Restaurant List").Select
+    For j = 2 To StoresEndRow
+        If Cells(j, SUniqueIDColumn).Value = UniqueID Then
+            If CStoreCount = Cells(j, SStoreCountColumn).Value And CLegacyCoop = Cells(j, SLegacyColumn).Value And CBaseCoop = Cells(j, SBaseColumn).Value And CNewCoop = Cells(j, SNewCoopColumn).Value Then
+                Exit For
+            Else
+                'More specific error
+                'updates store count on CC tracker tab
+                'this is the only part that actually changes the data as of now
+                If CStoreCount <> Cells(j, SStoreCountColumn).Value Then
+                    StoreCountTemp = Cells(j, SStoreCountColumn).Value
+                    Sheets("Coop Consolidation Tracker").Select
+                    Cells(i, CStoreCountColumn).Value = StoreCountTemp
+                    Rows(j).Select
+                    Sheets("Coop Consolidation Tracker").Select
+                    Rows(i).Select
+                    MsgBox "Error found and fixed in Row " & i & " on Coop Consolidation Tracker tab referencing Row " & j & " on Master Restaurant List. Store Count was listed as " & CStoreCount & " but has been updated to " & StoreCountTemp & "."
+                    Exit Sub
+                'can add more specific errors besides just store count
+                Else
+                End If
+                Rows(j).Select
+                Sheets("Coop Consolidation Tracker").Select
+                Rows(i).Select
+                MsgBox "Error. Incorrect data found in Row " & i & " on 'Coop Consolidation Tracker' tab referencing Row " & j & " in 'Master Restaurant List' tab."
+                Exit Sub
+            End If
+        Else
+        End If
+    Next j
+    Sheets("Coop Consolidation Tracker").Select
+Next i
+
+End Sub
